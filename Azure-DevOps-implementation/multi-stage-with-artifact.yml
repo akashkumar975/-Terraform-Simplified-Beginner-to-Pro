@@ -1,0 +1,109 @@
+
+trigger: none
+    
+pool:
+  vmImage: 'ubuntu-latest'
+variables:
+  - group: 'terraform-vg'
+  
+stages:
+- stage : qaplan
+  displayName: 'qaplan'
+  jobs:
+  - job: tfinstall
+    displayName: 'Plan Stage'
+    steps:
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: 'latest'
+    
+    - task: TerraformTaskV3@3
+      displayName: "Terraform Init"
+      inputs:  
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: '$(service-conn)'
+            backendAzureRmResourceGroupName: '$(rg_name)'
+            backendAzureRmStorageAccountName: '$(storage_account_name)'
+            backendAzureRmContainerName:  '$(container_name)'
+            backendAzureRmKey: '$(key)'
+   
+    - task: TerraformTaskV3@3
+      inputs:
+       provider: 'azurerm'
+       command: 'validate'
+    - task : TerraformTaskV3@3
+      displayName: "Terraform Plan" 
+      inputs:
+       provider : 'azurerm'
+       command : 'plan'
+       commandOptions: '-out qaplan'
+       environmentServiceNameAzureRM: '$(service-conn)'
+         
+    - task: ArchiveFiles@2
+      displayName: 'Create Plan Artifact'
+      inputs: 
+                includeRootFolder: false
+                rootFolderOrFile: $(System.DefaultWorkingDirectory)
+                archiveType: 'zip'
+                archiveFile: '$(Build.BuildId).zip'
+                replaceExistingArchive: true
+                displayName: 'Create Plan Artifact'
+          
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Plan Artifact'
+      inputs:
+                PathtoPublish: '$(Build.BuildId).zip'
+                ArtifactName: 'drop'
+                publishLocation: 'Container'
+                displayName: 'Publish Plan Artifact'
+
+- stage: qaapply
+  displayName: 'qaapply'
+  jobs:
+    - deployment: 'Deploy'
+      environment: qa
+     
+    - job:  Terraform_Apply
+      displayName: 'Apply Stage'
+      continueOnError : false
+      steps: 
+              
+             - checkout: none
+             - task: DownloadBuildArtifacts@0
+               displayName: "Download Artifact"
+               inputs:
+                 buildType: 'current'
+                 downloadType: 'single'
+                 artifactName: 'drop'
+                 downloadPath: '$(System.DefaultWorkingDirectory)'
+             - task: ExtractFiles@1
+               inputs:
+                        archiveFilePatterns: 'drop/*.zip'  # Specify the path to your archive file. Adjust the pattern as needed.
+                        destinationFolder: '$(Build.ArtifactStagingDirectory)'  # Specify the destination folder where the file will be extracted.
+             - task: TerraformInstaller@1
+               inputs:
+                 terraformVersion: 'latest'
+             
+             
+             - task: TerraformTaskV3@3
+               displayName: "Terraform Init"
+               inputs:  
+                 provider: 'azurerm'
+                 command: 'init'
+                 backendServiceArm: '$(service-conn)'
+                 backendAzureRmResourceGroupName: '$(rg_name)'
+                 backendAzureRmStorageAccountName: '$(storage_account_name)'
+                 backendAzureRmContainerName:  '$(container_name)'
+                 backendAzureRmKey: '$(key)'
+   
+       
+             - task : TerraformTaskV3@3
+               displayName: "Terraform Apply"
+               inputs:
+                  provider : 'azurerm'
+                  command : apply
+                  commandOptions: 'qaplan'
+                  workingDirectory : '$(Build.ArtifactStagingDirectory)'
+                  backendServiceArm: '$(service-conn)'
+                  environmentServiceNameAzureRM: '$(service-conn)'
