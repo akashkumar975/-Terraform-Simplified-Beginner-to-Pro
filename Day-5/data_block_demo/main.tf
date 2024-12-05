@@ -1,5 +1,6 @@
 
 
+
 resource "azurerm_storage_account" "example" {
   name                     = var.storage_account_name
   resource_group_name      = data.azurerm_resource_group.example.name
@@ -10,9 +11,5 @@ resource "azurerm_storage_account" "example" {
   tags = {
     environment = "staging"
   }
-}
-
-data "azurerm_resource_group" "example" {
-  name = "Data_block_demo"
 }
 

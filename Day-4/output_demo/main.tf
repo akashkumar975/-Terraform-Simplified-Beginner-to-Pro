@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "example" {
-  name     = "output_demo"
+  name     = "output-demo_RG"
   location = "West Europe"
 }
 
@@ -14,20 +14,19 @@ resource "azurerm_public_ip" "example" {
   }
 }
 
-
 output "ip_address" {
-    value = azurerm_public_ip.example.ip_address
+    value= azurerm_public_ip.example.ip_address
+  
+}
+output "name_pip" {
+    value= azurerm_public_ip.example.name
   
 }
 
-output "id" {
-    value = azurerm_public_ip.example.id
-  
-}
-
-output "public_ip_output" {
+output "ip_values" {
     value = {
-      ip_address= azurerm_public_ip.example.ip_address
-      id=  azurerm_public_ip.example.id
+        ip_address=azurerm_public_ip.example.ip_address
+        name_pip=azurerm_public_ip.example.name
     }
+  
 }

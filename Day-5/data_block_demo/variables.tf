@@ -1,4 +1,8 @@
 variable "storage_account_name" {
+    default = "demostorage156456"
   
-  default = "datablockstorage"
+}
+variable "rg_name" {
+    default = "demo-data-RG"
+  
 }
