@@ -3,8 +3,8 @@ resource "azurerm_resource_group" "example" {
   location = "West Europe"
 }
 
-
 variable "rg_name" {
-  type = number
-  default = "123"
+  type= number
+  default = 258
+  
 }

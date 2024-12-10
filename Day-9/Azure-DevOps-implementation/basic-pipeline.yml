@@ -1,0 +1,39 @@
+trigger: none 
+
+pool: 
+ vmImage: 'ubuntu-latest'
+ 
+stages:
+  - stage: terraform_demo 
+    displayName: terraform_demo 
+    jobs: 
+     - job: tf_implementation 
+       displayName: tf_implementation 
+       steps:
+       - task: TerraformInstaller@1
+         displayName: terraform_install 
+         inputs:
+           terraformVersion: 'latest'
+       
+       - task: TerraformTaskV4@4
+         displayName: terraform_init
+         inputs:
+           provider: 'azurerm'
+           command: 'init'
+           backendServiceArm: 'azure-sc'
+           backendAzureRmResourceGroupName: 'StorageAccount-ResourceGroup'
+           backendAzureRmStorageAccountName: 'tfstorageaccnt42312'
+           backendAzureRmContainerName: 'tfstate'
+           backendAzureRmKey: 'demo.terraform.tfstate'
+       - task: TerraformTaskV4@4
+         displayName: terraform_plan 
+         inputs:
+           provider: 'azurerm'
+           command: 'plan'
+           environmentServiceNameAzureRM: 'azure-sc'
+       - task: TerraformTaskV4@4
+         displayName: terraform_apply 
+         inputs:
+           provider: 'azurerm'
+           command: 'apply'
+           environmentServiceNameAzureRM: 'azure-sc'

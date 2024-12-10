@@ -1,0 +1,82 @@
+
+trigger: none
+    
+pool:
+  vmImage: 'ubuntu-latest'
+variables:
+  - group: 'terraform-vg'
+stages:
+- stage : demo_plan
+  displayName: 'demo_plan'
+  jobs:
+  - job: tfinstall
+    displayName: 'Terraform Install'
+    steps:
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: 'latest'
+    - task: TerraformTaskV3@3
+      displayName: "Terraform Init"
+      inputs:  
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: '$(service-conn)'
+            backendAzureRmResourceGroupName: '$(rg_name)'
+            backendAzureRmStorageAccountName: '$(storage_account_name)'
+            backendAzureRmContainerName:  '$(container_name)'
+            backendAzureRmKey: '$(key)'
+   
+    - task: TerraformTaskV3@3
+      inputs:
+       provider: 'azurerm'
+       command: 'validate'
+    - task : TerraformTaskV3@3
+      displayName: "Terraform Plan" 
+      inputs:
+       provider : 'azurerm'
+       command : 'plan'
+       commandOptions: '-out demo_plan'
+       environmentServiceNameAzureRM: '$(service-conn)'
+- stage: demo_apply
+  displayName: 'demo_apply'
+  jobs:
+    - deployment: 'Deploy'
+      environment: 'demo_' 
+     
+    - job:  Deploy_terrarform
+      continueOnError : false
+      steps:
+       - task: TerraformInstaller@1
+         inputs:
+           terraformVersion: 'latest'
+       - task: TerraformTaskV3@3
+         displayName: "Terraform Init"
+         inputs:  
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: '$(service-conn)'
+            backendAzureRmResourceGroupName: '$(rg_name)'
+            backendAzureRmStorageAccountName: '$(storage_account_name)'
+            backendAzureRmContainerName:  '$(container_name)'
+            backendAzureRmKey: '$(key)'
+   
+       - task: TerraformTaskV3@3
+         inputs:
+           provider: 'azurerm'
+           command: 'validate'
+       - task : TerraformTaskV3@3
+         displayName: "Terraform Plan" 
+         inputs:
+           provider : 'azurerm'
+           command : 'plan'
+           commandOptions: '  -out demo_plan'
+           environmentServiceNameAzureRM: '$(service-conn)'
+       
+       - task : TerraformTaskV3@3
+         displayName: "Terraform Apply"
+         inputs:
+                  provider : 'azurerm'
+                  command : apply
+                  commandOptions: 'demo_plan'
+                  backendServiceArm: '$(service-conn)'
+                  environmentServiceNameAzureRM: '$(service-conn)'
