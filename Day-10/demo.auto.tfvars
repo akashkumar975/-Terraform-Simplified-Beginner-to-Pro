@@ -13,7 +13,7 @@ vm_configs = {
 }
 vnet_config = {
   vnet_name             = "Infra_vnet"
-  vnet_address_prefixes = ["10.0.0.0/16"]
-  snet_name             = "Infra_snet"
-  snet_address_prefixes = ["10.0.2.0/24"]
+  vnet_address_space = ["10.0.0.0/16"]
+  sbnet_name             = "Infra_snet"
+  sbnet_address_space = ["10.0.2.0/24"]
 }

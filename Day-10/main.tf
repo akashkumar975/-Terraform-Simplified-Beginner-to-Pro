@@ -35,8 +35,8 @@ module "linuxvm" {
   }
   vnet_config = {
     vnet_name             = var.vnet_config.vnet_name
-    vnet_address_prefixes = var.vnet_config.vnet_address_prefixes
-    snet_name             = var.vnet_config.snet_name
-    snet_address_prefixes = var.vnet_config.snet_address_prefixes
+    vnet_address_prefixes = var.vnet_config.vnet_address_space
+    snet_name             = var.vnet_config.sbnet_name
+    snet_address_prefixes = var.vnet_config.sbnet_address_space
   }
 }
