@@ -17,6 +17,7 @@ terraform {
 provider "azurerm" {
   features {
   }
+  subscription_id = "a40088c8-9fd4-4470-9ebf-310f174f723e"
 }
 module "linuxvm" {
   source      = "git::https://ak-ado-organization@dev.azure.com/ak-ado-organization/terraform/_git/terraform"

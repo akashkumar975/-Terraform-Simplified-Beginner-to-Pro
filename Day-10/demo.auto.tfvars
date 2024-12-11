@@ -1,8 +1,8 @@
 rg_name     = "demo-RG"
-rg_location = "eastus"
+rg_location = "southindia"
 vm_configs = {
   vm_name              = "example-machine"
-  size                 = "Standard_F2"
+  vm_size                 = "Standard_F2"
   admin_username       = "adminuser"
   admin_password       = "Pa$$w0rd1234"
   storage_account_type = "Standard_LRS"
