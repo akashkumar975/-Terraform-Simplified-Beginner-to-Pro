@@ -1,7 +1,7 @@
 rg_name     = "demo-RG"
 rg_location = "southindia"
 vm_configs = {
-  vm_name              = "example-machine"
+  vm_name              = "example-machine1"
   vm_size                 = "Standard_F2"
   admin_username       = "adminuser"
   admin_password       = "Pa$$w0rd1234"
